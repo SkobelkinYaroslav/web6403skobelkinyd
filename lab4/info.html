@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Информация о мемах</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+
+<header>
+    <h1>Галерея мемов</h1>
+    <nav class="menu">
+        <a class="menu-el" href="index.html">Главная</a>|
+        <a class="menu-el" href="gallery.html">Галерея</a>|
+        <a class="menu-el" href="info.html">Информация о мемах</a>|
+        <a class="menu-el" href="form.html">Поиск мемов</a>
+    </nav>
+</header>
+
+<main>
+    <section>
+        <h2>Таблица популярных мемов</h2>
+        <table id="memesTable">
+            <tr>
+                <th>Название</th>
+                <th>Описание</th>
+                <th>Год популярности</th>
+            </tr>
+        </table>
+    </section>
+</main>
+<footer>
+    <p>&copy; Склад мемов </p>
+    <script>
+        async function loadMemes() {
+            const table = document.getElementById('memesTable');
+            try {
+                const response = await fetch('http://localhost:8000/data');
+
+                if (!response.ok) {
+                    throw new Error('Сеть не отвечает');
+                }
+                const jsonResponse = await response.json();
+
+                const data = jsonResponse.data;
+
+                data.forEach(meme => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${meme.name}</td>
+                    <td>${meme.description}</td>
+                    <td>${meme.year}</td>
+                `;
+                    table.appendChild(row);
+                });
+            } catch (error) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <div class="error">Ошибка получения данных</div>
+                `;
+                table.appendChild(row);
+            }
+        }
+
+        window.onload = loadMemes;
+    </script>
+</footer>
+</body>
+</html>
