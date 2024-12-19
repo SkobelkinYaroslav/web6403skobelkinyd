@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск мемов</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+    <h1>Галерея мемов</h1>
+    <nav class="menu">
+        <a class="menu-el" href="index.html">Главная</a>|
+        <a class="menu-el" href="gallery.html">Галерея</a>|
+        <a class="menu-el" href="info.html">Информация о мемах</a>|
+        <a class="menu-el" href="form.html">Поиск мемов</a>
+    </nav>
+</header>
+<main>
+    <div class="form-container">
+        <form id="searchForm">
+            <label for="searchQuery">Введите запрос для поиска мемов:</label>
+            <input type="text" id="searchQuery" name="searchQuery" required>
+            <span class="error" id="queryError"></span>
+            <br><br>
+
+            <button class="button" type="submit">Поиск</button>
+        </form>
+        <div class="message" id="responseMessage"></div>
+    </div>
+</main>
+<footer>
+    <p>&copy; Склад мемов </p>
+</footer>
+
+<script>
+    document.getElementById('searchForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const query = document.getElementById('searchQuery').value;
+        let valid = true;
+
+        const specialCharPattern = /[!@#$%^&*(),.?":{}|<>]/;
+        if (specialCharPattern.test(query)) {
+            document.getElementById('queryError').textContent = 'Запрос не должен содержать специальных символов.';
+            valid = false;
+        } else {
+            document.getElementById('queryError').textContent = '';
+        }
+
+        if (valid) {
+            const data = { query: query };
+
+            fetch('http://localhost:8000/search', {
+                method: 'POST', // Указываем метод POST
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Сеть не отвечает');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('responseMessage').textContent = `Найдено мемов: ${data.length}`;
+                })
+                .catch(error => {
+                    document.getElementById('responseMessage').textContent = 'Ошибка при поиске мемов';
+                });
+        }
+    });
+</script>
+
+</body>
+</html>
